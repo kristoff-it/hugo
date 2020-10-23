@@ -58,6 +58,7 @@ import (
 	_ "github.com/gohugoio/hugo/tpl/time"
 	_ "github.com/gohugoio/hugo/tpl/transform"
 	_ "github.com/gohugoio/hugo/tpl/urls"
+	_ "github.com/gohugoio/hugo/tpl/zig"
 )
 
 var _ texttemplate.ExecHelper = (*templateExecHelper)(nil)
