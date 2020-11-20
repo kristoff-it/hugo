@@ -5,7 +5,7 @@ import (
 	"github.com/gohugoio/hugo/tpl/internal"
 )
 
-const name = "zig"
+const name = "zignew"
 
 func init() {
 	f := func(d *deps.Deps) *internal.TemplateFuncsNamespace {
@@ -15,7 +15,7 @@ func init() {
 			// Start testing all snippets in a concurrent fashion!
 			go ctx.Warmup("docgen-samples/")
 		} else {
-			println("[Zig] Test rendering is disabled!")
+			println("[Zig Doctest] Test rendering is disabled!")
 		}
 
 		ns := &internal.TemplateFuncsNamespace{
@@ -23,8 +23,8 @@ func init() {
 			Context: func(args ...interface{}) interface{} { return ctx },
 		}
 
-		ns.AddMethodMapping(ctx.Docgen,
-			[]string{"Docgen"},
+		ns.AddMethodMapping(ctx.Doctest,
+			[]string{"Doctest"},
 			[][2]string{},
 		)
 
