@@ -11,11 +11,17 @@ func init() {
 	f := func(d *deps.Deps) *internal.TemplateFuncsNamespace {
 		ctx := New(d)
 
-		if run_tests, _ := d.Cfg.GetStringMap("params")["render_zig_tests"]; run_tests.(bool) {
-			// Start testing all snippets in a concurrent fashion!
-			go ctx.Warmup("docgen-samples/")
+		params := d.Cfg.GetStringMap("params")
+		if run_tests, ok := params["disable_zig_rendering"]; ok && !(run_tests.(bool)) {
+			if basepath, ok := params["zig_code_basepath"]; ok {
+				// Start testing all snippets concurrently!
+				go ctx.Warmup(basepath.(string))
+			} else {
+				println("[Zig Doctest] Warning, no `zig_code_basepath` specified in the config, so startup warmup was skipped!")
+			}
+
 		} else {
-			println("[Zig] Test rendering is disabled!")
+			println("[Zig Doctest] Test rendering is disabled!")
 		}
 
 		ns := &internal.TemplateFuncsNamespace{
@@ -23,8 +29,8 @@ func init() {
 			Context: func(args ...interface{}) interface{} { return ctx },
 		}
 
-		ns.AddMethodMapping(ctx.Docgen,
-			[]string{"Docgen"},
+		ns.AddMethodMapping(ctx.Doctest,
+			[]string{"doctest"},
 			[][2]string{},
 		)
 

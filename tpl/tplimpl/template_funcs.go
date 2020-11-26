@@ -59,7 +59,6 @@ import (
 	_ "github.com/gohugoio/hugo/tpl/transform"
 	_ "github.com/gohugoio/hugo/tpl/urls"
 	_ "github.com/gohugoio/hugo/tpl/zig"
-	_ "github.com/gohugoio/hugo/tpl/zignew"
 )
 
 var _ texttemplate.ExecHelper = (*templateExecHelper)(nil)
