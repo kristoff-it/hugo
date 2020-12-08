@@ -9,9 +9,9 @@ const name = "zig"
 
 func init() {
 	f := func(d *deps.Deps) *internal.TemplateFuncsNamespace {
-		ctx := New(d)
-
 		params := d.Cfg.GetStringMap("params")
+		ctx := New(d, params)
+
 		if run_tests, ok := params["disable_zig_rendering"]; ok && !(run_tests.(bool)) {
 			if basepath, ok := params["zig_code_basepath"]; ok {
 				// Start testing all snippets concurrently!

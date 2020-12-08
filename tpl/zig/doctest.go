@@ -16,11 +16,12 @@ import (
 	"github.com/spf13/cast"
 )
 
-func New(deps *deps.Deps) *Namespace {
+func New(deps *deps.Deps, params map[string]interface{}) *Namespace {
 	return &Namespace{
 		deps:      deps,
 		notifLock: &sync.Mutex{},
 		cache:     deps.FileCaches.AssetsCache(),
+		params:    params,
 	}
 }
 
@@ -28,6 +29,7 @@ type Namespace struct {
 	deps      *deps.Deps
 	notifLock *sync.Mutex
 	cache     *filecache.Cache
+	params    map[string]interface{}
 }
 
 func (ns *Namespace) Doctest(s interface{}) (template.HTML, error) {
@@ -56,17 +58,32 @@ func (ns *Namespace) run(file string) (string, error) {
 	var out bytes.Buffer
 	var stderr bytes.Buffer
 
-	doctest_exe := os.Getenv("ZIG_DOCTEST")
-	if doctest_exe == "" {
-		return "", _errors.Errorf("missing doctest env variable, set `ZIG_DOCTEST` to the path where the doctest executable lives")
+	var doctest_exe string = "doctest" // assume its in path
+	if dc_path, ok := ns.params["zig_doctest_path"]; ok {
+		doctest_exe = dc_path.(string)
+	}
+
+	var zig_exe string // if missing we don't specify the setting
+	if zig_path, ok := ns.params["zig_path"]; ok {
+		zig_exe = zig_path.(string)
 	}
 
 	abs_file, err := filepath.Abs(file)
 	if err != nil {
 		return "", _errors.Errorf("failed to grab an absolute path to the script")
 	}
-
-	cmd := exec.Command(doctest_exe, "inline", "--in_file", abs_file)
+	command_args := []string {
+		"inline", 
+		"--in_file", 
+		abs_file,
+	}
+	if (zig_exe != "") {
+		command_args = append(command_args, []string{
+			"--zig_exe",
+			zig_exe,
+		}...)
+	}
+	cmd := exec.Command(doctest_exe, command_args...)
 	cmd.Stdout = &out
 	cmd.Stderr = &stderr
 	if err := cmd.Run(); err != nil {
